@@ -1,5 +1,6 @@
 package com.example.netowrk_training.ui.viewmodel
 
+import android.R
 import android.app.Application
 import android.content.Context
 import android.net.ConnectivityManager
@@ -15,28 +16,27 @@ import kotlinx.coroutines.launch
 import okio.IOException
 import retrofit2.Response
 
-class NewsViewModel(app: Application,val newsRepo: NewsRepository) : AndroidViewModel(app) {
+class NewsViewModel(app: Application, val newsRepo: NewsRepository) : AndroidViewModel(app) {
 
-    val headLines : MutableLiveData<AppStates<News>> = MutableLiveData()
+    val headLines: MutableLiveData<AppStates<News>> = MutableLiveData()
     var headlinesPage: Int = 1
     var headlineResponse: News? = null
 
-     val searchNews : MutableLiveData<AppStates<News>> = MutableLiveData()
+    val searchNews: MutableLiveData<AppStates<News>> = MutableLiveData()
     var searchPage: Int = 1
-    var searchResponse : News? = null
+    var searchResponse: News? = null
     var newSearchQuery: String? = null
     var oldSearchQuery: String? = null
 
-    private fun getHeadlinesResponse(response: Response<News>) : AppStates<News> {
-        if(response.isSuccessful){
-            response.body()?.let {
-                result ->
+    private fun handleHeadlinesResponse(response: Response<News>): AppStates<News> {
+        if (response.isSuccessful) {
+            response.body()?.let { result ->
                 headlinesPage++
-                if(headlineResponse == null){
+                if (headlineResponse == null) {
                     headlineResponse = result
-                }else{
-                    val oldArticle = headlineResponse?.articles ?: emptyList()
-                    val newArticle = result.articles
+                } else {
+                    val oldArticle = headlineResponse?.articles.orEmpty()
+                    val newArticle = result.articles.orEmpty()
                     val combined = oldArticle + newArticle
                     headlineResponse = headlineResponse?.copy(articles = combined)
                 }
@@ -48,21 +48,19 @@ class NewsViewModel(app: Application,val newsRepo: NewsRepository) : AndroidView
         return AppStates.Error(response.message())
     }
 
-    private fun searchNewsByKeywordResponse(response: Response<News>) : AppStates<News> {
-        if(response.isSuccessful){
-            response.body()?.let {
-                    result ->
+    private fun handleSearchNewsByKeywordResponse(response: Response<News>): AppStates<News> {
+        if (response.isSuccessful) {
+            response.body()?.let { result ->
                 searchPage++
-                if(searchResponse == null){
+                if (searchResponse == null) {
                     searchResponse = result
-                }else{
-                    val oldArticle = searchResponse?.articles ?: emptyList()
-                    val newArticle = result.articles
+                } else {
+                    val oldArticle = searchResponse?.articles.orEmpty()
+                    val newArticle = result.articles.orEmpty()
                     val combined = oldArticle + newArticle
                     searchResponse = searchResponse?.copy(articles = combined)
                 }
                 return AppStates.Success(searchResponse ?: result)
-
             }
 
         }
@@ -74,9 +72,8 @@ class NewsViewModel(app: Application,val newsRepo: NewsRepository) : AndroidView
         newsRepo.addToFavorite(article)
     }
 
-    fun getFavoriteArticle() = viewModelScope.launch {
-        newsRepo.getFavorite()
-    }
+    fun getFavoriteArticle() = newsRepo.getFavorite()
+
 
     fun deleteArticleFromFavorite(article: Article) = viewModelScope.launch {
         newsRepo.removeFromFavorite(article)
@@ -95,23 +92,30 @@ class NewsViewModel(app: Application,val newsRepo: NewsRepository) : AndroidView
         }
     }
 
+    fun getHeadLines(countryCode: String) = viewModelScope.launch {
+        getHeadlinesResponse(countryCode)
+    }
 
-    private suspend fun getHeadlines(country: String){
+    fun searchNews(keyword: String) = viewModelScope.launch {
+        searchNewsResponse(keyword)
+    }
+
+
+    private suspend fun getHeadlinesResponse(country: String) {
         headLines.postValue(AppStates.Loading())
-        try{
-            if(checkConnection(this.getApplication())){
-                val response = newsRepo.getHeadlineNews(country,headlinesPage)
-                headLines.postValue(getHeadlinesResponse(response))
-            }else{
+        try {
+            if (checkConnection(this.getApplication())) {
+                val response = newsRepo.getHeadlineNews(country, headlinesPage)
+                headLines.postValue(handleHeadlinesResponse(response))
+            } else {
                 headLines.postValue(AppStates.Error("No internet Connection"))
             }
-        }catch (t: Throwable){
-            when(t) {
+        } catch (t: Throwable) {
+            when (t) {
                 is IOException -> headLines.postValue(AppStates.Error("Unable to Connect"))
                 else -> headLines.postValue(AppStates.Error("No signal"))
 
             }
-
 
 
         }
@@ -119,23 +123,21 @@ class NewsViewModel(app: Application,val newsRepo: NewsRepository) : AndroidView
 
     }
 
-
-    private suspend fun searchNews(country: String){
+    private suspend fun searchNewsResponse(query: String) {
         searchNews.postValue(AppStates.Loading())
-        try{
-            if(checkConnection(this.getApplication())){
-                val response = newsRepo.searchNews(country,searchPage)
-                searchNews.postValue(searchNewsByKeywordResponse(response))
-            }else{
+        try {
+            if (checkConnection(this.getApplication())) {
+                val response = newsRepo.searchNews(query, searchPage)
+                searchNews.postValue(handleSearchNewsByKeywordResponse(response))
+            } else {
                 searchNews.postValue(AppStates.Error("No internet Connection"))
             }
-        }catch (t: Throwable){
-            when(t) {
+        } catch (t: Throwable) {
+            when (t) {
                 is IOException -> searchNews.postValue(AppStates.Error("Unable to Connect"))
                 else -> searchNews.postValue(AppStates.Error("No signal"))
 
             }
-
 
 
         }

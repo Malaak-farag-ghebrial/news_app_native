@@ -13,7 +13,7 @@ import com.bumptech.glide.Glide
 import com.example.netowrk_training.R
 import com.example.netowrk_training.models.Article
 
-class NewsListAdapter(private var articles: List<Article>) :
+class NewsListAdapter() :
     RecyclerView.Adapter<NewsListAdapter.ArticleViewHolder>() {
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -24,6 +24,7 @@ class NewsListAdapter(private var articles: List<Article>) :
      }
 
     private var onItemClickListener : ((Article)-> Unit)? = null
+
     override fun onBindViewHolder(
         holder: ArticleViewHolder,
         position: Int
@@ -86,5 +87,10 @@ class NewsListAdapter(private var articles: List<Article>) :
 
 
         val differ = AsyncListDiffer(this,differCallback)
+
+
+    fun onItemClicked(listener: (Article)-> Unit){
+        onItemClickListener = listener
+    }
 
 }
