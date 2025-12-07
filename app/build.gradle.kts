@@ -3,7 +3,6 @@ plugins {
     alias(libs.plugins.kotlin.android)
     id("com.google.devtools.ksp") version "2.3.3"
     id("androidx.navigation.safeargs")
-    id("com.google.gms.google-services")
 //    id("com.google.devtools.ksp")
 //    id("androidx.navigation.safeargs.kotlin")
 }
@@ -33,6 +32,7 @@ android {
             )
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
@@ -52,8 +52,6 @@ dependencies {
     implementation(libs.material)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
-    implementation(libs.firebase.config.ktx)
-    implementation(libs.firebase.common.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -73,9 +71,6 @@ dependencies {
     implementation (libs.navigation.ui.ktx)
     implementation (libs.glide)
     ksp (libs.glide.compiler)
-    implementation("com.google.firebase:firebase-config-ktx")
-    implementation(platform("com.google.firebase:firebase-bom:34.6.0"))
-    implementation("com.google.firebase:firebase-analytics")
 
 
 
