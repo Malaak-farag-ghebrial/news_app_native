@@ -59,22 +59,22 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
             findNavController().navigate(R.id.action_searchFragment_to_articleFragment,bundle)
         }
 
-        var job: Job? = null
-        binding.searchInput.addTextChangedListener {
-           text ->
-            job?.cancel()
-            job = MainScope().launch {
-                delay(SEARCH_NEWS_TIME_DELAY)
-                text?.let {
-                    if(text.toString().isNotEmpty()){
-                        newsViewModel.searchNews(text.toString())
+        binding.searchButton.setOnClickListener {
+            val text = binding.searchInput.text
+            var job: Job? = null
+                job?.cancel()
+                job = MainScope().launch {
+                    delay(SEARCH_NEWS_TIME_DELAY)
+                    text?.let {
+                        if(text.toString().isNotEmpty()){
+                            newsViewModel.searchNews(text.toString())
+                        }
                     }
+
                 }
 
-            }
 
         }
-
 
         newsViewModel.searchNews.observe(viewLifecycleOwner, Observer{
                 response ->
@@ -85,22 +85,22 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
                             message->
                         Snackbar.make(view,"Error : $message", Snackbar.LENGTH_SHORT).show()
                         if(!isLastPage){
-                            showErrorMessage(message)
+                          //  showErrorMessage(message)
                         }
 
                     }
                     if(!isLastPage){
-                        showErrorMessage(response.message.toString())
+                      //  showErrorMessage(response.message.toString())
                     }
 
 
                 }
                 is AppStates.Loading<*> -> {
-                    hideErrorMessage()
+                    // hideErrorMessage()
                     showProgressBar()
                 }
                 is AppStates.Success<*> -> {
-                    hideErrorMessage()
+                  //  hideErrorMessage()
                     hideProgressBar()
                     response.data?.let {
                             newsResponse ->
@@ -122,7 +122,7 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
             if(binding.searchInput.text.isNotEmpty()){
                 newsViewModel.searchNews(binding.searchInput.text.toString())
             }else{
-                hideErrorMessage()
+              //  hideErrorMessage()
             }
         }
 
@@ -139,16 +139,16 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
         isLoading = true
     }
 
-    private fun hideErrorMessage(){
-        binding.errorMessageSearch.root.visibility = View.INVISIBLE
-        isError = false
-    }
-
-    private fun showErrorMessage(message: String){
-        binding.errorMessageSearch.root.visibility =  View.VISIBLE
-        binding.errorMessageSearch.errorText.text = message
-        isError = true
-    }
+//    private fun hideErrorMessage(){
+//        binding.errorMessageSearch.root.visibility = View.INVISIBLE
+//        isError = false
+//    }
+//
+//    private fun showErrorMessage(message: String){
+//        binding.errorMessageSearch.root.visibility =  View.VISIBLE
+//        binding.errorMessageSearch.errorText.text = message
+//        isError = true
+//    }
 
 
 

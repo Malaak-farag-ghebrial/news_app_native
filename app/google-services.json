@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "695292074132",
+    "project_id": "newsapp-f29bd",
+    "storage_bucket": "newsapp-f29bd.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:695292074132:android:ed585e20b55f519f8f7c81",
+        "android_client_info": {
+          "package_name": "com.example.netowrk_training"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAPNVB0ILaO1Wn8pX_6YLfanOvj4QB54pc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

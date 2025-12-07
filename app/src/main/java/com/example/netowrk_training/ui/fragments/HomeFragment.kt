@@ -20,6 +20,7 @@ import com.example.netowrk_training.utils.AppStates
 import com.example.netowrk_training.utils.Constants
 import com.google.android.material.snackbar.Snackbar
 import java.util.concurrent.locks.Condition
+import kotlin.math.ceil
 
 
 class HomeFragment : Fragment(R.layout.fragment_home) {
@@ -91,8 +92,11 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                     response.data?.let {
                         newsResponse ->
                         newsAdapter.differ.submitList(newsResponse.articles.orEmpty())
-                        val totalPage = newsResponse.totalResults / Constants.QUERY_PAGE_SIZE
-                        isLastPage = newsViewModel.headlinesPage == totalPage
+                        val totalPage: Double = newsResponse.totalResults.toDouble() / Constants.QUERY_PAGE_SIZE
+                        isLastPage = newsViewModel.headlinesPage - 1 == ceil(totalPage).toInt()
+                        Log.d("totalPage", "totalPage : ${ceil(totalPage).toInt()}")
+                        Log.d("totalPage", "totalRes : ${newsResponse.totalResults}")
+                        Log.d("isLastPage", "headPage : ${newsViewModel.headlinesPage}")
                         if(isLastPage){
                             binding.headlinesList.setPadding(0,0,0,0)
                         }
@@ -121,13 +125,13 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     }
 
     private fun hideErrorMessage(){
-        binding.errorMessage.root.visibility = View.INVISIBLE
+//        binding.errorMessage.root.visibility = View.INVISIBLE
         isError = false
     }
 
     private fun showErrorMessage(message: String){
-        binding.errorMessage.root.visibility =  View.VISIBLE
-        binding.errorMessage.errorText.text = message
+//        binding.errorMessage.root.visibility =  View.VISIBLE
+//        binding.errorMessage.errorText.text = message
         isError = true
     }
 
@@ -145,16 +149,17 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
             val firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition()
 
             val isAtEnd = (visibleItemCount + firstVisibleItemPosition) >= totalItemCount
-            val isListLongEnough = totalItemCount >= Constants.QUERY_PAGE_SIZE
+            // val isListLongEnough = totalItemCount >= Constants.QUERY_PAGE_SIZE
 
-            val paginate: Boolean = !isError && !isLoading  && !isLastPage && isAtEnd && isListLongEnough && firstVisibleItemPosition >= 0
+            val paginate: Boolean = !isError && !isLoading  && !isLastPage && isAtEnd && isScroll
 
-            Log.i(this::class.java.simpleName,"isError : $isError")
-//            Log.i("isLoading","isLoading : $isLoading")
-//            Log.i("isLastPage","isLastPage : $isLastPage")
-//            Log.i("isAtEnd","isAtEnd : $isAtEnd")
-//            Log.i("isListLongEnough","isListLongEnough : $isListLongEnough")
-//            Log.i("firstVisibleItemPosition","firstVisibleItemPosition : $firstVisibleItemPosition")
+            Log.d("totalItemCount", "totalItemCount : $totalItemCount")
+            Log.d("isError","isError : $isError") // false
+            Log.d("isLoading","isLoading : $isLoading") // false
+            Log.d("isLastPage","isLastPage : $isLastPage") // false
+            Log.d("isAtEnd","isAtEnd : $isAtEnd") // false
+         //   Log.d("isListLongEnough","isListLongEnough : $isListLongEnough") // false
+            Log.d("firstVisibleItemPosition","firstVisibleItemPosition : $firstVisibleItemPosition")
 
             if(paginate){
                 newsViewModel.getHeadLines("us")
@@ -165,7 +170,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
         override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
             super.onScrollStateChanged(recyclerView, newState)
-
+            isScroll = true
         }
     }
 

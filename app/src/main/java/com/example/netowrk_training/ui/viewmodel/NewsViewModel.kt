@@ -49,6 +49,7 @@ class NewsViewModel(app: Application, val newsRepo: NewsRepository) : AndroidVie
     }
 
     private fun handleSearchNewsByKeywordResponse(response: Response<News>): AppStates<News> {
+
         if (response.isSuccessful) {
             response.body()?.let { result ->
                 searchPage++
@@ -126,9 +127,16 @@ class NewsViewModel(app: Application, val newsRepo: NewsRepository) : AndroidVie
     private suspend fun searchNewsResponse(query: String) {
         searchNews.postValue(AppStates.Loading())
         try {
+            if(query != oldSearchQuery){
+                searchPage = 1
+                searchResponse = null
+            }
+
+
             if (checkConnection(this.getApplication())) {
                 val response = newsRepo.searchNews(query, searchPage)
                 searchNews.postValue(handleSearchNewsByKeywordResponse(response))
+                oldSearchQuery = query
             } else {
                 searchNews.postValue(AppStates.Error("No internet Connection"))
             }
