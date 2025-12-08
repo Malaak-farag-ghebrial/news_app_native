@@ -6,14 +6,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AbsListView
-import androidx.core.widget.addTextChangedListener
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.netowrk_training.R
 import com.example.netowrk_training.adapters.NewsListAdapter
-import com.example.netowrk_training.databinding.FragmentHomeBinding
 import com.example.netowrk_training.databinding.FragmentSearchBinding
 import com.example.netowrk_training.ui.MainActivity
 import com.example.netowrk_training.ui.viewmodel.NewsViewModel
@@ -58,6 +57,11 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
             }
             findNavController().navigate(R.id.action_searchFragment_to_articleFragment,bundle)
         }
+        binding.searchButton.setColorFilter(
+            ContextCompat.getColor(requireContext(), R.color.border),
+            android.graphics.PorterDuff.Mode.SRC_IN
+        )
+
 
         binding.searchButton.setOnClickListener {
             val text = binding.searchInput.text
