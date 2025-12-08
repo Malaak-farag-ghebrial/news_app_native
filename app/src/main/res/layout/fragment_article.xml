@@ -15,11 +15,13 @@
         android:id="@+id/floating_fav_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:importantForAccessibility="no"
         app:layout_constraintBottom_toBottomOf="parent"
          app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginBottom="30dp"
         android:layout_marginEnd="30dp"
         android:src="@drawable/favorite"
+        android:tint="@color/border"
         app:maxImageSize="35dp"
         />
 

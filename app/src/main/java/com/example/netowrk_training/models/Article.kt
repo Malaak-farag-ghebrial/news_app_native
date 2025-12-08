@@ -9,11 +9,11 @@ import java.io.Serializable
 data class Article(
     @PrimaryKey(true)
     val id: Int? = null,
-    val author: String,
-    val content: String,
+    val author: String?=null,
+    val content: String?=null,
     val description: String,
     val publishedAt: String,
-    val source: Source,
+    val source: Source?=null,
     val title: String,
     val url: String,
     val urlToImage: String? = null

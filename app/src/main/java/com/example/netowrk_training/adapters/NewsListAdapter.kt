@@ -13,84 +13,52 @@ import com.bumptech.glide.Glide
 import com.example.netowrk_training.R
 import com.example.netowrk_training.models.Article
 
-class NewsListAdapter() :
-    RecyclerView.Adapter<NewsListAdapter.ArticleViewHolder>() {
-    override fun onCreateViewHolder(
-        parent: ViewGroup,
-        viewType: Int
-    ): ArticleViewHolder {
-        val card = LayoutInflater.from(parent.context).inflate(R.layout.news_item_card,parent,false)
+class NewsListAdapter() : RecyclerView.Adapter<NewsListAdapter.ArticleViewHolder>() {
+
+    private var onItemClickListener: ((Article) -> Unit)? = null
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ArticleViewHolder {
+        val card = LayoutInflater.from(parent.context)
+            .inflate(R.layout.news_item_card, parent, false)
         return ArticleViewHolder(card)
-     }
+    }
 
-    private var onItemClickListener : ((Article)-> Unit)? = null
-
-    override fun onBindViewHolder(
-        holder: ArticleViewHolder,
-        position: Int
-    ) {
+    override fun onBindViewHolder(holder: ArticleViewHolder, position: Int) {
         val article = differ.currentList[position]
 
-        image = holder.itemView.findViewById<ImageView>(R.id.article_image)
-       title = holder.itemView.findViewById<TextView>(R.id.article_title)
-       description = holder.itemView.findViewById<TextView>(R.id.description)
-       source = holder.itemView.findViewById<TextView>(R.id.article_source)
-       date = holder.itemView.findViewById<TextView>(R.id.article_date)
+        // bind data
+        Glide.with(holder.itemView).load(article.urlToImage).into(holder.image)
+        holder.title.text = article.title
+        holder.description.text = article.description
+        holder.source.text = article.source?.name?:""
+        holder.date.text = article.publishedAt
 
-        holder.itemView.apply {
-            Glide.with(this).load(article.urlToImage).into(image)
-            title.text = article.title
-            description.text = article.description
-            source.text = article.source.name
-            date.text = article.publishedAt
-
-            setOnClickListener {
-                onItemClickListener?.let{
-                    it(article)
-                }
-            }
-        }
-        fun setOnItemClick(listener: (Article)-> Unit){
-            onItemClickListener = listener
+        holder.itemView.setOnClickListener {
+            onItemClickListener?.invoke(article)
         }
     }
 
-    override fun getItemCount(): Int {
-        return differ.currentList.size
-    }
+    override fun getItemCount(): Int = differ.currentList.size
 
-
-     class ArticleViewHolder(view: View) : RecyclerView.ViewHolder(view)
-        lateinit var image: ImageView
-        lateinit var title: TextView
-        lateinit var description : TextView
-        lateinit var source : TextView
-        lateinit var date: TextView
-
-
-       private val differCallback = object : DiffUtil.ItemCallback<Article>(){
-           override fun areItemsTheSame(
-               oldItem: Article,
-               newItem: Article
-           ): Boolean {
-               return oldItem.url == newItem.url
-           }
-
-           override fun areContentsTheSame(
-               oldItem: Article,
-               newItem: Article
-           ): Boolean {
-              return oldItem == newItem
-           }
-
-       }
-
-
-        val differ = AsyncListDiffer(this,differCallback)
-
-
-    fun onItemClicked(listener: (Article)-> Unit){
+    fun setOnItemClick(listener: (Article) -> Unit) {
         onItemClickListener = listener
     }
 
+    class ArticleViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        val image: ImageView = view.findViewById(R.id.article_image)
+        val title: TextView = view.findViewById(R.id.article_title)
+        val description: TextView = view.findViewById(R.id.description)
+        val source: TextView = view.findViewById(R.id.article_source)
+        val date: TextView = view.findViewById(R.id.article_date)
+    }
+
+    private val differCallback = object : DiffUtil.ItemCallback<Article>() {
+        override fun areItemsTheSame(oldItem: Article, newItem: Article): Boolean =
+            oldItem.url == newItem.url
+
+        override fun areContentsTheSame(oldItem: Article, newItem: Article): Boolean =
+            oldItem == newItem
+    }
+
+    val differ = AsyncListDiffer(this, differCallback)
 }

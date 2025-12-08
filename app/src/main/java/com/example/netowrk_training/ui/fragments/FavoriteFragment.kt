@@ -49,7 +49,7 @@ class FavoriteFragment : Fragment(R.layout.fragment_favorite) {
         newsViewModel = (activity as MainActivity).newsViewModel
         setupFavoriteList()
 
-        newsAdapter.onItemClicked {
+        newsAdapter.setOnItemClick {
             val bundle = Bundle().apply {
                 putSerializable("article", it)
             }
