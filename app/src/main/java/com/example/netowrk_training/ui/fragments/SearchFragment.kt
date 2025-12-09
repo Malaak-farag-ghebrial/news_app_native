@@ -7,14 +7,18 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.AbsListView
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.netowrk_training.R
 import com.example.netowrk_training.adapters.NewsListAdapter
+import com.example.netowrk_training.database.ArticleDatabase
 import com.example.netowrk_training.databinding.FragmentSearchBinding
+import com.example.netowrk_training.repository.NewsRepository
 import com.example.netowrk_training.ui.MainActivity
+import com.example.netowrk_training.ui.viewmodel.NewsProviderViewModel
 import com.example.netowrk_training.ui.viewmodel.NewsViewModel
 import com.example.netowrk_training.utils.AppStates
 import com.example.netowrk_training.utils.Constants
@@ -24,10 +28,13 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlin.getValue
 
 class SearchFragment : Fragment(R.layout.fragment_search) {
     lateinit var binding : FragmentSearchBinding
-    lateinit var newsViewModel: NewsViewModel
+    private val newsViewModel : NewsViewModel by activityViewModels {
+        NewsProviderViewModel(requireActivity().application,NewsRepository(ArticleDatabase.invoke(requireContext())))
+    }
     lateinit var newsAdapter: NewsListAdapter
 
     var isLoading = false
@@ -48,7 +55,6 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentSearchBinding.bind(view)
 
-        newsViewModel = (activity as MainActivity).newsViewModel
         setupNewsList()
 
         newsAdapter.setOnItemClick {

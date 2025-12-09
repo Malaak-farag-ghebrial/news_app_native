@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    id("com.google.gms.google-services")
     id("com.google.devtools.ksp") version "2.3.3"
     id("androidx.navigation.safeargs")
 //    id("com.google.devtools.ksp")
@@ -71,6 +72,9 @@ dependencies {
     implementation (libs.navigation.ui.ktx)
     implementation (libs.glide)
     ksp (libs.glide.compiler)
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.analytics)
+    implementation("com.google.firebase:firebase-config")
 
 
 

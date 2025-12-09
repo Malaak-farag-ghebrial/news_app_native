@@ -6,28 +6,43 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AbsListView
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.netowrk_training.R
 import com.example.netowrk_training.adapters.NewsListAdapter
+import com.example.netowrk_training.database.ArticleDatabase
 import com.example.netowrk_training.databinding.FragmentHomeBinding
+import com.example.netowrk_training.remote.RetrofitInstance
+import com.example.netowrk_training.repository.NewsRepository
 import com.example.netowrk_training.ui.MainActivity
+import com.example.netowrk_training.ui.viewmodel.NewsProviderViewModel
 import com.example.netowrk_training.ui.viewmodel.NewsViewModel
 import com.example.netowrk_training.utils.AppStates
 import com.example.netowrk_training.utils.Constants
 import com.google.android.material.snackbar.Snackbar
-import java.util.concurrent.locks.Condition
+import com.google.firebase.Firebase
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig
+import com.google.firebase.remoteconfig.remoteConfig
+import com.google.firebase.remoteconfig.remoteConfigSettings
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.tasks.await
+import kotlin.getValue
 import kotlin.math.ceil
 
 
 class HomeFragment : Fragment(R.layout.fragment_home) {
 
     lateinit var binding : FragmentHomeBinding
-    lateinit var newsViewModel: NewsViewModel
+    private val newsViewModel : NewsViewModel by activityViewModels {
+        NewsProviderViewModel(requireActivity().application,NewsRepository(ArticleDatabase.invoke(requireContext())))
+    }
     lateinit var newsAdapter: NewsListAdapter
+
 
     var isLoading = false
     var isError = false
@@ -39,7 +54,6 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_home, container, false)
     }
 
@@ -47,9 +61,19 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentHomeBinding.bind(view)
 
-
-        newsViewModel = (activity as MainActivity).newsViewModel
         setupNewsList()
+
+
+
+
+            if (newsViewModel.headLines.value?.data?.articles.isNullOrEmpty()) {
+                newsViewModel.getHeadLines("us")
+            }
+
+
+
+
+
 
         newsAdapter.setOnItemClick {
             val bundle = Bundle().apply {
@@ -58,9 +82,9 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
             findNavController().navigate(R.id. action_homeFragment_to_articleFragment,bundle)
         }
 
-        if (newsViewModel.headLines.value?.data?.articles.isNullOrEmpty()) {
-            newsViewModel.getHeadLines("us")
-        }
+
+
+
 
 
 

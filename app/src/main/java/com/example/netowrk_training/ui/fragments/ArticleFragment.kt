@@ -10,17 +10,23 @@ import android.webkit.WebViewClient
 import androidx.core.content.ContextCompat
 import androidx.navigation.fragment.navArgs
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.LiveData
 import com.example.netowrk_training.R
+import com.example.netowrk_training.database.ArticleDatabase
 import com.example.netowrk_training.databinding.FragmentArticleBinding
+import com.example.netowrk_training.repository.NewsRepository
 import com.example.netowrk_training.ui.MainActivity
+import com.example.netowrk_training.ui.viewmodel.NewsProviderViewModel
 import com.example.netowrk_training.ui.viewmodel.NewsViewModel
 import com.google.android.material.snackbar.Snackbar
 import java.lang.Exception
 
 class ArticleFragment : Fragment(R.layout.fragment_article) {
 
-    lateinit var newsViewModel : NewsViewModel
+    private val newsViewModel : NewsViewModel by activityViewModels {
+        NewsProviderViewModel(requireActivity().application,NewsRepository(ArticleDatabase.invoke(requireContext())))
+    }
     val args : ArticleFragmentArgs by navArgs<ArticleFragmentArgs>()
     lateinit var binding: FragmentArticleBinding
     var isFavorite : Boolean = false
@@ -32,7 +38,6 @@ class ArticleFragment : Fragment(R.layout.fragment_article) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentArticleBinding.bind(view)
 
-        newsViewModel = (activity as MainActivity).newsViewModel
         val article = args.article
 
         binding.webviewArticle.apply {
